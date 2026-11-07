@@ -1,0 +1,43 @@
+{
+  "name": "dsh-live-studio",
+  "version": "0.1.0-alpha.1",
+  "description": "DSH 虚拟主播：弹幕互动、语音、Live2D 桥接和直播画面",
+  "type": "module",
+  "main": "index.js",
+  "license": "MIT",
+  "keywords": [
+    "dsh-plugin",
+    "dsh",
+    "agent",
+    "bilibili"
+  ],
+  "files": [
+    "index.js",
+    "launcher.mjs",
+    "cordis.patch.yml",
+    "backend",
+    "examples",
+    "requirements.txt",
+    "README.md",
+    "NOTICE.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/schemastery": "^3.18.4"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "author": {
+    "name": "XiaoZheBrother",
+    "email": "958117002@qq.com"
+  }
+}
