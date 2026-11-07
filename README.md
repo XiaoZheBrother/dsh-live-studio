@@ -4,7 +4,7 @@
 
 独立的虚拟主播插件：接收 B 站直播弹幕、合并同一观众的问题、生成语音、连接鲸语 Live2D、输出浏览器直播画面，并记录模型消耗与礼物金额。
 
-当前为 **0.1.0-alpha.1 开发预览**，尚未发布 GitHub Release，也未完成全新 DSH 安装和真实直播验收。不会替你点击开播，不包含模型素材。默认关闭。
+当前为 **0.1.0-alpha.1 开发预览**，源码已公开，尚未完成全新 DSH 启动和真实直播验收。不会替你点击开播，不包含模型素材。默认关闭。
 
 ## 本地安装与配置
 
@@ -54,4 +54,4 @@ $env:DSH_HOME = 'D:\my-agent-data'
 dsh plugin --profile web add '<生成的 tgz 绝对路径>'
 ```
 
-游戏插件需要先把同版本直播插件 tgz 安装到同一 profile。安装不会自动启用；填写插件配置后再打开 enabled。开发包不得覆盖正在运行的旧任务，请先停旧实例。当前没有可供复制的 GitHub Release 下载链接。
+游戏插件需要先把同版本直播插件 tgz 安装到同一 profile。安装不会自动启用；填写插件配置后再打开 enabled。开发包不得覆盖正在运行的旧任务，请先停旧实例。开发版可从 [GitHub 源码](https://github.com/XiaoZheBrother/dsh-live-studio) 克隆后执行 `npm pack` 安装；目前不提供稳定版 Release。

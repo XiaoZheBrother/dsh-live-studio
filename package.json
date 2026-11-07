@@ -39,5 +39,13 @@
   "author": {
     "name": "XiaoZheBrother",
     "email": "958117002@qq.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/XiaoZheBrother/dsh-live-studio.git"
+  },
+  "homepage": "https://github.com/XiaoZheBrother/dsh-live-studio#readme",
+  "bugs": {
+    "url": "https://github.com/XiaoZheBrother/dsh-live-studio/issues"
   }
 }
