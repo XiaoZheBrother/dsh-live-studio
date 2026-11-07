@@ -1,6 +1,6 @@
 import { spawn } from 'node:child_process'
 import { mkdirSync, writeFileSync, existsSync } from 'node:fs'
-import { resolve, join } from 'node:path'
+import { resolve, join, delimiter } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 export function launchArguments(config, gameBackend) {
@@ -44,7 +44,8 @@ export function mountService(ctx, config, name, gameBackend) {
     const launch=launchArguments(config,gameBackend)
     state='starting';persist()
     child=spawn(launch.executable,launch.args,{windowsHide:true,shell:false,
-      env:{...process.env,PYTHONUTF8:'1'},stdio:['pipe','pipe','pipe']})
+      env:{...process.env,PYTHONUTF8:'1',DAFEIYU_PREFILL_HOME:resolve(config.home),
+        PYTHONPATH:[fileURLToPath(new URL('./backend/prefill_python',import.meta.url)),process.env.PYTHONPATH].filter(Boolean).join(delimiter)},stdio:['pipe','pipe','pipe']})
     let output=''
     child.stdout.on('data',data=>{output=(output+data).slice(-2000);if(output.includes('Local rehearsal:')){state='running';persist()}})
     child.stderr.on('data',()=>{}) // Provider packet bodies must not reach DSH logs.
