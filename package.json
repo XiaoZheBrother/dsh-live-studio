@@ -1,6 +1,6 @@
 {
   "name": "dsh-live-studio",
-  "version": "0.2.0-alpha.1",
+  "version": "0.2.0-alpha.2",
   "description": "DSH 虚拟主播：弹幕互动、语音、Live2D 桥接和直播画面",
   "type": "module",
   "main": "index.js",
@@ -20,13 +20,15 @@
     "requirements.txt",
     "README.md",
     "NOTICE.md",
-    "LICENSE"
+    "LICENSE",
+    "avatar-tools.mjs"
   ],
   "engines": {
     "node": ">=22.19.0"
   },
   "peerDependencies": {
-    "@deepseek-ai/schemastery": "^3.18.4"
+    "@deepseek-ai/schemastery": "^3.18.4",
+    "@deepseek-ai/dsh-tools": ">=0.2.1-rc.5"
   },
   "dsh": {
     "bundle": {

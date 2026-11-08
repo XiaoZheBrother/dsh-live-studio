@@ -6,9 +6,9 @@ import mimetypes
 import secrets
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import unquote, urlsplit
+from urllib.parse import unquote, urlsplit, parse_qs
 
-def handler(pet, take, port, model=None, chat=None, credit=None, live=None, jingyu_url=None, ledger=None, game=None):
+def handler(pet, take, port, model=None, chat=None, credit=None, live=None, jingyu_url=None, ledger=None, game=None, avatar=None):
     from game_video import GameVideo
     video = GameVideo()
     page = Path(__file__).with_name('live-pilot.html')
@@ -59,13 +59,16 @@ def handler(pet, take, port, model=None, chat=None, credit=None, live=None, jing
                 self.headers.get('Origin')!='http://'+host or
                 not secrets.compare_digest(self.headers.get('X-Pilot-Token',''),token)):
                 self.send_error(403); return
-            if self.path not in ('/api/chat','/api/live/next','/api/game/control','/api/game/message','/api/game/next','/api/game/review') or chat is None: self.send_error(404); return
+            avatar_request=avatar is not None and self.path in ('/api/avatar/perform','/api/avatar/ack')
+            if not avatar_request and (self.path not in ('/api/chat','/api/live/next','/api/game/control','/api/game/message','/api/game/next','/api/game/review') or chat is None): self.send_error(404); return
             try:
                 size=int(self.headers.get('Content-Length','0'))
                 if not 0<size<=8192 or self.headers.get('Content-Type')!='application/json':
                     self.send_error(400); return
                 body=json.loads(self.rfile.read(size))
                 if not isinstance(body,dict): raise ValueError('格式不正确')
+                if avatar_request:
+                    self.json(avatar.submit(body) if self.path.endswith('/perform') else avatar.ack(body.get('id'),body.get('state'))); return
                 if self.path.startswith('/api/game/'):
                     if game is None: self.send_error(404); return
                     if self.path=='/api/game/control':
@@ -108,6 +111,18 @@ def handler(pet, take, port, model=None, chat=None, credit=None, live=None, jing
             if self.headers.get('Host') not in (f'127.0.0.1:{port}',f'localhost:{port}'):
                 self.send_error(403); return
             path = unquote(urlsplit(self.path).path)
+            if avatar:
+                if path=='/api/avatar/catalog': self.json(avatar.assets.catalog()); return
+                if path=='/api/avatar/render': self.json(avatar.assets.render_catalog()); return
+                if path=='/api/avatar/status': self.json(avatar.status()); return
+                if path=='/api/avatar/events':
+                    try: self.json(avatar.poll(int(parse_qs(urlsplit(self.path).query).get('after',['0'])[0])))
+                    except ValueError: self.json({'error':'Invalid cursor'},400)
+                    return
+                if path.startswith(('/avatar','/vendor/','/model/')):
+                    file=avatar.assets.asset(path)
+                    if not file or not file.is_file(): self.send_error(404); return
+                    self.send_body(file.read_bytes(),mimetypes.guess_type(file.name)[0] or 'application/octet-stream'); return
             if path=='/api/game/video' and game:
                 if self.headers.get('Origin') and not self.video_origin(): self.send_error(403); return
                 self.json({'token':video.token,'signal':video.read()}); return
@@ -124,7 +139,7 @@ def handler(pet, take, port, model=None, chat=None, credit=None, live=None, jing
             if path=='/api/service':
                 self.json({'name':'dsh-game-agent' if game else 'dsh-live-studio','version':'0.1.0-alpha.1'}); return
             if path=='/api/config':
-                self.json({'game':game is not None,'jingyuUrl':jingyu_url,'live':live.snapshot() if live else None,'credit':credit,'token':token,'chat':chat is not None,'model':('/model/'+model_files[0].name) if model else '/pet/model/c_0120.model3.json'}); return
+                self.json({'avatarUrl':'/avatar' if avatar else None,'game':game is not None,'jingyuUrl':jingyu_url,'live':live.snapshot() if live else None,'credit':credit,'token':token,'chat':chat is not None,'model':('/model/'+model_files[0].name) if model else '/pet/model/c_0120.model3.json'}); return
             if path.startswith('/live-audio/') and chat:
                 body=chat.audio.get(path.removeprefix('/live-audio/'))
                 if body: self.send_body(body,'audio/mpeg'); return
@@ -160,6 +175,7 @@ def main():
     parser.add_argument('--take',type=Path,default=Path(__file__).parent/'empty-take')
     parser.add_argument('--port',type=int,default=3088)
     parser.add_argument('--model',type=Path)
+    parser.add_argument('--cubism-core',type=Path,help='User-supplied licensed Cubism Core JavaScript; not bundled')
     parser.add_argument('--credit')
     parser.add_argument('--live-room',type=int)
     parser.add_argument('--jingyu-url')
@@ -172,6 +188,11 @@ def main():
     parser.add_argument('--game-channel',default='1')
     parser.add_argument('--game-plugin',type=Path)
     args=parser.parse_args()
+    avatar=None
+    if args.cubism_core:
+        if not args.model: parser.error('--cubism-core requires --model')
+        from avatar_runtime import AvatarAssets, AvatarQueue
+        avatar=AvatarQueue(AvatarAssets(args.model,args.cubism_core))
     if args.managed:
         import threading, sys, os
         def watch_host():
@@ -207,7 +228,7 @@ def main():
         if not args.home: parser.error('--live-room requires --home')
         from live_room import LiveRoom
         live=LiveRoom(args.live_room,args.live_credential,ledger,game.receive_live if game else None)
-    server=ThreadingHTTPServer(('127.0.0.1',args.port),handler(args.pet.resolve(),args.take.resolve(),args.port,args.model.resolve() if args.model else None,chat,args.credit,live,args.jingyu_url,ledger,game))
+    server=ThreadingHTTPServer(('127.0.0.1',args.port),handler(args.pet.resolve(),args.take.resolve(),args.port,args.model.resolve() if args.model else None,chat,args.credit,live,args.jingyu_url,ledger,game,avatar))
     if game: game.start()
     if live: live.start()
     print(f'Local rehearsal: http://127.0.0.1:{args.port}',flush=True)

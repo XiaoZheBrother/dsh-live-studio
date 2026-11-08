@@ -10,7 +10,10 @@ export function launchArguments(config, gameBackend) {
   if (!existsSync(resolve(config.persona))) throw Error('角色文件不存在')
   const args = ['-u', fileURLToPath(new URL('./backend/live-pilot-server.py', import.meta.url)),
     '--managed', '--port', String(port), '--home', resolve(config.home), '--persona', resolve(config.persona)]
-  if (config.jingyuUrl) {
+  if (config.cubismCore) {
+    if (!config.model) throw Error('内置舞台需要 model 目录')
+    args.push('--model',resolve(config.model),'--cubism-core',resolve(config.cubismCore))
+  } else if (config.jingyuUrl) {
     const url = new URL(config.jingyuUrl)
     if (url.protocol !== 'http:' || !['127.0.0.1', 'localhost'].includes(url.hostname) || url.username || url.password) throw Error('鲸语地址须为本机 HTTP 地址')
     args.push('--jingyu-url', url.href)

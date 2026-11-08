@@ -59,7 +59,7 @@ textarea{display:block;width:100%;background:#091629;color:#fff;border:1px solid
 
 </aside></main>
 <footer><span id="model-credit">模型加载中</span>· 仅本地非商业预演。对话使用现有人设与只读记忆快照，尚非 DSH 实时会话；本次模拟不写入正式记忆。</footer>
-<script src="/live-vendor/pixi-7.4.3.min.js"></script><script src="/pet/vendor/live2dcubismcore.min.js"></script><script src="/live-vendor/cubism4-0.5.0-beta.min.js"></script>
+
 <script>
 const streamPreview=new URLSearchParams(location.search).get('view')==='stream';if(streamPreview){document.body.classList.add('preview');document.querySelector('h1').textContent='大肥鱼的小小直播间';document.querySelector('header small').textContent='AI 虚拟主播';}
 const visualOnly=new URLSearchParams(location.search).get('preview')==='1';
@@ -83,8 +83,8 @@ async function speak(url){
  finally{clearTimeout(timeout)}
 }
 async function initJingyu(stage,url){
- const target=new URL(url),frame=document.createElement('iframe');frame.title='鲸语 1.5 角色';frame.style='position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none';
- const ready=new Promise((resolve,reject)=>{const timer=setTimeout(()=>{window.removeEventListener('message',onReady);reject(Error('鲸语角色加载超时'))},30000);function onReady(e){if(e.origin===target.origin&&e.source===frame.contentWindow&&e.data?.type==='lane-ready'){clearTimeout(timer);window.removeEventListener('message',onReady);resolve()}}window.addEventListener('message',onReady)});
+ const target=new URL(url,location.origin),frame=document.createElement('iframe');frame.title='Live2D 角色';frame.style='position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none';
+ const ready=new Promise((resolve,reject)=>{const timer=setTimeout(()=>{window.removeEventListener('message',onReady);reject(Error('Live2D 角色加载超时'))},30000);function onReady(e){if(e.origin===target.origin&&e.source===frame.contentWindow&&e.data?.type==='lane-ready'){clearTimeout(timer);window.removeEventListener('message',onReady);resolve()}}window.addEventListener('message',onReady)});
  frame.src=url;stage.prepend(frame);await ready;
  function sync(){let sum=0;if(analyser&&!audio.paused){analyser.getByteTimeDomainData(bins);for(const v of bins)sum+=((v-128)/128)**2}frame.contentWindow.postMessage({type:'sync',text:$('#subtitle').textContent,audio:{paused:audio.paused,currentTime:audio.currentTime,duration:Number.isFinite(audio.duration)?audio.duration:0},level:bins?Math.min(1,Math.sqrt(sum/bins.length)*5):0},target.origin);requestAnimationFrame(sync)}sync();
 }
@@ -92,7 +92,7 @@ $('#audio-retry').onclick=()=>{if(pendingAudio)speak(pendingAudio)};
 $('#stop').onclick=cancel;$('#next').onclick=()=>{cancel();play((index+1)%data.rows.length)};$('#start').onclick=()=>{cancel();started=Date.now();playing=true;play(0);timer=setInterval(()=>{const elapsed=(Date.now()-started)/1000;if(elapsed>=600){cancel();state('语音样例播放结束');return}if(!audio.paused)return;const next=data.rows[index+1];if(next&&elapsed>=next.at)play(index+1)},500)};
 (async()=>{try{
 config=await(await fetch('/api/config')).json();$('#model-credit').textContent=config.credit || (config.model.startsWith('/pet/')?'模型：氵六青 · 角色：上善无形 / ZipZipPipe · CC BY-NC-SA 4.0':config.model.endsWith('/whale-maid.model3.json')?'模型：br0ny4/dsh-live2d-pet · 社区鲸鱼娘二创':'模型：Mao绒绒家园「大肥鱼」');if(config.live){document.body.classList.add('real-chat');$('#live-toggle').hidden=false;document.querySelector('header small').textContent=streamOutput?'AI 虚拟主播':'直播间 '+config.live.room+' · 真实弹幕待接收 · 弹幕接收状态不代表开播状态';}data=await(await fetch('/take/rehearsal.json')).json();for(const [i,r]of data.rows.entries()){const el=document.createElement('div');el.className='row';el.textContent=(i+1)+'. '+r.comments.join(' / ');el.onclick=()=>{cancel();play(i)};$('#rounds').append(el)}
-const stage=$('#stage');const jingyuUrl=config.jingyuUrl;if(jingyuUrl){await initJingyu(stage,jingyuUrl);}else{app=new PIXI.Application({resizeTo:stage,backgroundAlpha:0,antialias:true,resolution:Math.min(devicePixelRatio,1.5),autoDensity:true});app.ticker.maxFPS=30;stage.prepend(app.view);PIXI.live2d.Live2DModel.registerTicker(PIXI.Ticker);
+const stage=$('#stage');const jingyuUrl=config.avatarUrl||config.jingyuUrl;if(jingyuUrl){await initJingyu(stage,jingyuUrl);}else{for(const src of ["/live-vendor/pixi-7.4.3.min.js","/pet/vendor/live2dcubismcore.min.js","/live-vendor/cubism4-0.5.0-beta.min.js"])await new Promise((resolve,reject)=>{const script=document.createElement("script");script.src=src;script.onload=resolve;script.onerror=reject;document.head.append(script)});app=new PIXI.Application({resizeTo:stage,backgroundAlpha:0,antialias:true,resolution:Math.min(devicePixelRatio,1.5),autoDensity:true});app.ticker.maxFPS=30;stage.prepend(app.view);PIXI.live2d.Live2DModel.registerTicker(PIXI.Ticker);
 // Cubism's default buffer supports 36 mask groups; this model has 49.
 // Allocate multiple buffers using the renderer's supported initialization API.
 const rendererPrototype=PIXI.live2d.CubismRenderer_WebGL.prototype;
