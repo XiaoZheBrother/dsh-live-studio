@@ -1,6 +1,6 @@
 {
   "name": "dsh-live-studio",
-  "version": "0.2.0-alpha.2",
+  "version": "0.2.0-alpha.3",
   "description": "DSH 虚拟主播：弹幕互动、语音、Live2D 桥接和直播画面",
   "type": "module",
   "main": "index.js",
