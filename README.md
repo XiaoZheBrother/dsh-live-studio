@@ -4,7 +4,7 @@
 
 独立的虚拟主播插件：接收 B 站直播弹幕、合并同一观众的问题、生成语音、连接鲸语 Live2D、输出浏览器直播画面，并记录模型消耗与礼物金额。
 
-当前为 **0.1.0-alpha.1 开发预览**，源码已公开，尚未完成全新 DSH 启动和真实直播验收。不会替你点击开播，不包含模型素材。默认关闭。
+当前为 **0.2.0-alpha.1 开发预览**，源码已公开，尚未完成全新 DSH 启动和真实直播验收。不会替你点击开播，不包含模型素材。默认关闭。
 
 ## 直播效果
 
@@ -66,4 +66,14 @@ $env:DSH_HOME = 'D:\my-agent-data'
 dsh plugin --profile web add '<生成的 tgz 绝对路径>'
 ```
 
-游戏插件需要先把同版本直播插件 tgz 安装到同一 profile。安装不会自动启用；填写插件配置后再打开 enabled。开发包不得覆盖正在运行的旧任务，请先停旧实例。开发版可从 [GitHub 源码](https://github.com/XiaoZheBrother/dsh-live-studio) 克隆后执行 `npm pack` 安装；目前不提供稳定版 Release。
+游戏插件需要先把同版本直播插件 tgz 安装到同一 profile。安装不会自动启用；填写插件配置后再打开 enabled。开发包不得覆盖正在运行的旧任务，请先停旧实例。开发版可从 [GitHub 源码](https://github.com/XiaoZheBrother/dsh-live-studio) 克隆后执行 `npm pack` 安装；开发预览发行包见 [Releases](https://github.com/XiaoZheBrother/dsh-live-studio/releases)。
+
+## v0.2.0-alpha.1：共享表演组件与统一前缀
+
+人设、只读记忆和工作台推理前缀由公共加载器读取；陪看场景与直播/写稿场景分别构建上下文，不用写稿要求强迫角色陪看时发言。
+
+`backend/live_performance.py` 提供已支持表情/动作目录、提示信息与命令校验，允许 `keep` / `none`。`backend/live-performance.mjs` 提供 `createPerformanceController`，消费模型选出的表演计划；头部动作和手势可同时运行，手势结束执行退出动作，不按剧情或情绪自动映射表情。
+
+这次发布的是可供渲染器复用的组件，**不自动给每一条直播弹幕添加表情，也未把所有鲸语模型统一成同一种命名**。当前神宫凉子鲸鱼娘适配由陪看渲染器实际使用；别的模型需要匹配动作与参数。组件使用自身画面时钟，不能把原片时间与导出时间混用。
+
+离线陪看已拆为 [dsh-reaction-studio](https://github.com/XiaoZheBrother/dsh-reaction-studio)：持续观察、自主开口、暂停/回看、时间戳听觉证据与视频制作。直播用户不必安装识别模型和媒体制作依赖。两个插件都默认关闭，不迁移或清空现有记忆。
