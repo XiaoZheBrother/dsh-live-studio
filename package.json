@@ -9,7 +9,13 @@
     "dsh-plugin",
     "dsh",
     "agent",
-    "bilibili"
+    "bilibili",
+    "deepseek-harness",
+    "ai-agent",
+    "live2d",
+    "virtual-streamer",
+    "text-to-speech",
+    "live-chat"
   ],
   "files": [
     "index.js",
@@ -21,7 +27,9 @@
     "README.md",
     "NOTICE.md",
     "LICENSE",
-    "avatar-tools.mjs"
+    "avatar-tools.mjs",
+    "docs/agent-guide.md",
+    "llms.txt"
   ],
   "engines": {
     "node": ">=22.19.0"

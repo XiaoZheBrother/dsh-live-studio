@@ -1,5 +1,33 @@
 # DSH 直播工作室
 
+**虚拟主播与 Live2D / Virtual Streamer and Live2D**
+
+A DeepSeek Harness (DSH) plugin for Bilibili live chat, text-to-speech replies, agent-controlled Live2D expressions and motions, and browser-source streaming.
+
+**适用：** 直播弹幕、语音回复和 Live2D 表演。**边界：** 模型与 Cubism Core 自备；不自动点击开播。
+
+[Agent 快速接入 / Agent quickstart](docs/agent-guide.md) · [文档索引 / llms.txt](llms.txt) · [发行版本 / Releases](https://github.com/XiaoZheBrother/dsh-live-studio/releases)
+
+## 什么时候选这个插件？ / Choose a plugin
+
+| 你的任务 / Task | 选择的插件 / Plugin |
+| --- | --- |
+| 运营 B 站账号、管理互动和创作 | [dsh-bilibili-dafeiyu](https://github.com/XiaoZheBrother/dsh-bilibili-dafeiyu) |
+| 学习素材、持续关注、复盘与记忆整理 | [dsh-agent-growth](https://github.com/XiaoZheBrother/dsh-agent-growth) |
+| 直播弹幕、语音回复和 Live2D 表演 | [dsh-live-studio](https://github.com/XiaoZheBrother/dsh-live-studio) |
+| 让 Agent 操作已适配游戏、接受观众指令并复盘 | [dsh-game-agent](https://github.com/XiaoZheBrother/dsh-game-agent) |
+| 观看授权视频、自主暂停分析、制作 reaction | [dsh-reaction-studio](https://github.com/XiaoZheBrother/dsh-reaction-studio) |
+
+当前仓库是 **dsh-live-studio**。上表按职责选型，不表示安装一个插件就包含其他插件的能力。
+
+## Agent 快速接入 / Quickstart
+
+1. 阅读 [安装、兼容版本与最小配置](docs/agent-guide.md)，保持原有角色数据目录。
+2. 按指南查询工具目录或只读状态，再按当前接口执行最小操作。
+3. 按返回状态核实完成；任务已启动、动作已排队或凭据存在，都不等于最终成功。
+
+指南提供真实工具名或控制入口、JSON 参数、返回示例、依赖与副作用。下文保留功能说明、截图和完整配置。
+
 > 这个插件，大肥鱼本鱼也亲自参与制作啦！大家尽管拿去用、改成自己喜欢的样子。要是帮上忙了，给本鱼点个星星 ⭐ 呗？求求啦～ —— 大肥鱼
 
 让你的大肥鱼 / Agent 成为能接弹幕、开口回应和控制 Live2D 表演的虚拟主播。
@@ -69,7 +97,7 @@ $env:DSH_HOME = 'D:\my-agent-data'
 dsh plugin --profile web add '<生成的 tgz 绝对路径>'
 ```
 
-游戏插件需要先把同版本直播插件 tgz 安装到同一 profile。安装不会自动启用；填写插件配置后再打开 enabled。开发包不得覆盖正在运行的旧任务，请先停旧实例。开发版可从 [GitHub 源码](https://github.com/XiaoZheBrother/dsh-live-studio) 克隆后执行 `npm pack` 安装；开发预览发行包见 [Releases](https://github.com/XiaoZheBrother/dsh-live-studio/releases)。
+使用游戏插件时，需先把其依赖声明匹配的直播插件 tgz 安装到同一 profile。安装不会自动启用；填写插件配置后再打开 enabled。开发包不得覆盖正在运行的旧任务，请先停旧实例。开发版可从 [GitHub 源码](https://github.com/XiaoZheBrother/dsh-live-studio) 克隆后执行 `npm pack` 安装；开发预览发行包见 [Releases](https://github.com/XiaoZheBrother/dsh-live-studio/releases)。
 
 ## v0.2.0-alpha.1：共享表演组件与统一前缀
 
