@@ -27,8 +27,11 @@ def load_context(home, persona_path, scene='rehearsal'):
     context = []
     if memory_name and Path(memory_name).name == memory_name:
         root = home/'soul-md/memory'/memory_name/'topics'
-        for file in sorted(root.glob('*.md'))[-8:]:
-            context.append({'source':file.name, 'text':file.read_text(encoding='utf8')[:2500]})
+        files=sorted(root.glob('*.md'))
+        if scene not in ('reaction','reaction_offline'):files=files[-8:]
+        for file in files:
+            text=file.read_text(encoding='utf8')
+            context.append({'source':file.name, 'text':text if scene in ('reaction','reaction_offline') else text[:2500]})
     catalog = read_optional(home/'bili-duty/guard-catalog.json', {'videos':[]})
     if catalog.get('videos') and str(catalog.get('ownerUid')) != str(cfg.get('accountUid')):
         raise ValueError('Publication owner mismatch')
